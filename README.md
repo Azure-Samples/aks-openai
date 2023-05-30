@@ -32,7 +32,9 @@ azureDeploy: "https://raw.githubusercontent.com/Azure-Samples/aks-istio-addon-bi
 
 # How to deploy and run an Azure OpenAI ChatGPT application on AKS
 
-This article shows how to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of a [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). A chatbot is an application that simulates human-like conversations with users via chat. Its key task is to answer user questions with instant messages. [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview).
+This article shows how to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of a [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). A chatbot is an application that simulates human-like conversations with users via chat. Its key task is to answer user questions with instant messages. [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). The chatbot application simulates the original [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball) plastic sphere, made to look like an oversized eight ball, that is used for fortune-telling or seeking advice.
+
+![Magic 8 Ball](/images/magic8ball.png)
 
 AI applications can be used to perform tasks such as [summarizing articles](https://www.zdnet.com/article/how-to-use-chatgpt-to-summarize-a-book-article-or-research-paper/), writing stories, and engaging in long conversations with chatbots. This is made possible by [large language models (LLMs)](https://en.wikipedia.org/wiki/Large_language_model) like OpenAI ChatGPT, which are deep learning algorithms capable of recognizing, summarizing, translating, predicting, and generating text and other content. LLMs leverage the knowledge acquired from extensive datasets, enabling them to perform tasks that go beyond teaching AI human languages. These models have found success in diverse domains, including understanding proteins, writing software code, and more. Apart from their applications in natural language processing, such as translation, chatbots, and AI assistants, large language models are also extensively employed in healthcare, software development, and various other fields.
 
@@ -263,7 +265,8 @@ resource openAi 'Microsoft.CognitiveServices/accounts@2022-12-01' = {
   }
 }
 
-resource model 'Microsoft.CognitiveServices/accounts/deployments@2022-12-01' = [for deployment in deployments: {
+resource model 'Microsoft.CognitiveServices/accounts/deployments@2022-12-01' = 
+                                                                    [for deployment in deployments: {
   name: deployment.name
   parent: openAi
   properties: {
