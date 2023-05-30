@@ -32,7 +32,7 @@ azureDeploy: "https://raw.githubusercontent.com/Azure-Samples/aks-istio-addon-bi
 
 # How to deploy and run an Azure OpenAI ChatGPT application on AKS
 
-This article shows how to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of a [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). A chatbot is an application that simulates human-like conversations with users via chat. Its key task is to answer user questions with instant messages. [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). The chatbot application simulates the original [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball) plastic sphere, made to look like an oversized eight ball, that is used for fortune-telling or seeking advice.
+This sample shows how to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of a [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). A chatbot is an application that simulates human-like conversations with users via chat. Its key task is to answer user questions with instant messages. [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). The chatbot application simulates the original [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball) plastic sphere, made to look like an oversized eight ball, that is used for fortune-telling or seeking advice.
 
 ![Magic 8 Ball](/images/magic8ball.png)
 
@@ -67,7 +67,7 @@ az extension update --name aks-preview
 
 ## Architecture
 
-This sample provides a set of Bicep modules to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates agains Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). The following diagram shows the architecture and network topology deployed by the sample:
+This sample provides a set of Bicep modules to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of the [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). The following diagram shows the architecture and network topology deployed by the sample:
 
 ![AKS Architecture](images/architecture.png)
 
@@ -304,7 +304,7 @@ This bicep module allows you to pass an array containing the definition of one o
 
 ## AKS Cluster Bicep module
 
-The `aksCluster.bicep` Bicep module is used to deploy the [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster. In particular, the following code snippet creates the user-defined managed identity used by the chatbot to acquire a security token from Azure Active Directory via [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview). When the boolean `openAiEnabled` parameter is `true`, the Bicep code perform the following steps:
+The `aksCluster.bicep` Bicep module is used to deploy the [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster. In particular, the following code snippet creates the user-defined managed identity used by the chatbot to acquire a security token from Azure Active Directory via [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview). When the boolean `openAiEnabled` parameter is `true`, the Bicep code performs the following steps:
 
 - Creates a new user-defined managed identity.
 - Assign the new managed identity to the Cognitive Services User role with the resource group as a scope.
@@ -370,7 +370,7 @@ Workloads deployed on an Azure Kubernetes Services (AKS) cluster require Azure A
 
 [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identities-overview) uses [Service Account Token Volume Projection](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#serviceaccount-token-volume-projection) to enable pods to use a Kubernetes service account. When enabled, the [AKS OIDC Issuer](https://learn.microsoft.com/en-us/azure/aks/use-oidc-issuer) issues a service account security token to a workload and [OIDC federation](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#openid-connect-tokens) enables the application to access Azure resources securely with Azure AD based on annotated service accounts.
 
-Azure AD workload identity works especially well with the [Azure Identity client libraries](#azure-identity-client-libraries) and the [Microsoft Authentication Library (MSAL)](https://learn.microsoft.com/en-us/azure/active-directory/develop/msal-overview) collection if you're using a [a registered application](https://learn.microsoft.com/en-us/azure/active-directory/develop/application-model#register-an-application) instead of a managed identity. Your workload can use any of these libraries to seamlessly authenticate and access Azure cloud resources.
+Azure AD workload identity works well with the [Azure Identity client libraries](#azure-identity-client-libraries) and the [Microsoft Authentication Library (MSAL)](https://learn.microsoft.com/en-us/azure/active-directory/develop/msal-overview) collection if you use a [registered application](https://learn.microsoft.com/en-us/azure/active-directory/develop/application-model#register-an-application) instead of a managed identity. Your workload can use any of these libraries to seamlessly authenticate and access Azure cloud resources.
 
 For more information, see the following resources:
 
@@ -674,7 +674,7 @@ The `requirements.txt` file under the `scripts` folder contains the list of pack
 pip install -r requirements.txt --upgrade
 ```
 
-The followin table contains the code of the `app.py` chatbot:
+The following table contains the code of the `app.py` chatbot:
 
 ```python
 # Import packages
@@ -996,7 +996,7 @@ OpenAI trained the ChatGPT and GPT-4 models to accept input formatted as a conve
 ```json
 {"role": "system", "content": "Provide some context and/or instructions to the model"},
 {"role": "user", "content": "The users messages goes here"},
-{"role": "assistant", "content": "The response message goes here."},
+{"role": "assistant", "content": "The response message goes here."}
 ```
 
 The `system` role also known as the system message is included at the beginning of the array. This message provides the initial instructions to the model. You can provide various information in the system role including:
@@ -1010,8 +1010,6 @@ The `system` role also known as the system message is included at the beginning 
 The `system` role or message is optional, but it's recommended to at least include a basic one to get the best results. The `user` role or message represents an input or inquiry from the user, while the `assistant` message corresponds to the response generated by the GPT API. This dialog exchange aims to simulate a human-like conversation, where the user message initiates the interaction and the assistant message provides a relevant and informative answer. This context helps the chat model generate a more appropriate response later on. The last user message refers to the prompt currently requested.  For more information, see [Learn how to work with the ChatGPT and GPT-4 models](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/how-to/chatgpt?pivots=programming-language-chat-completions).
 
 ## Application Configuration
-
-The application handles the `user_change` callback function to handle the `on_change` event of the [st.input_text](https://docs.streamlit.io/library/api-reference/widgets/st.text_input) element used by a user to submit questions to the chatbot.
 
 Make sure to provide a value for the following environment variables when testing the `app.py` Python app locally, for example in Visual Studio Code. You can eventually define environment variables in a `.env` file in the same folder as the `app.py` file.
 
@@ -1071,8 +1069,8 @@ openai.api_version = "2023-05-15"
 
 You can use two different authentication methods in the `magic8ball` chatbot application:
 
-- `API key`: set the `AZURE_OPENAI_TYPE` environment variable to azure and the AZURE_OPENAI_KEY environment variable to the key of your Azure OpenAI resource. You can use the regional endpoint, such as [https://eastus.api.cognitive.microsoft.com/](https://eastus.api.cognitive.microsoft.com/), in the `AZURE_OPENAI_BASE` environment variable, to connect to the Azure OpenAI resource.
-- `Azure Active Directory`: set the `AZURE_OPENAI_TYPE` environment variable to azure_ad and use a service principal or managed identity with the [DefaultAzureCredential](https://learn.microsoft.com/en-us/python/api/azure-identity/azure.identity.defaultazurecredential?view=azure-python) object to acquire a security token from Azure Active Directory. For more information on the DefaultAzureCredential in Python, see [Authenticate Python apps to Azure services by using the Azure SDK for Python](https://docs.microsoft.com/en-us/azure/developer/python/azure-sdk-authenticate?tabs=cmd). Make sure to assign the `Cognitive Services User` role to the service principal or managed identity used to authenticate to your Azure OpenAI Service. For more information, see [How to configure Azure OpenAI Service with managed identities](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/how-to/managed-identity). If you want to use Azure AD integrated security, you need to create a custom subdomain for your Azure OpenAI resource and use the specific endpoint containing the custom domain, such as [https://myopenai.openai.azure.com/](https://myopenai.openai.azure.com/) where myopenai is the custom subdomain. If you specify the regional endpoint, you get a wonderful error: `Subdomain does not map to a resource`. Hence, make sure to pass the endpoint containing the custom domain in the AZURE_OPENAI_BASE environment variable. In this case, you also need to periodically refresh the security token.
+- `API key`: set the `AZURE_OPENAI_TYPE` environment variable to `azure` and the `AZURE_OPENAI_KEY` environment variable to the key of your Azure OpenAI resource. You can use the regional endpoint, such as [https://eastus.api.cognitive.microsoft.com/](https://eastus.api.cognitive.microsoft.com/), in the `AZURE_OPENAI_BASE` environment variable, to connect to the Azure OpenAI resource.
+- `Azure Active Directory`: set the `AZURE_OPENAI_TYPE` environment variable to `azure_ad` and use a service principal or managed identity with the [DefaultAzureCredential](https://learn.microsoft.com/en-us/python/api/azure-identity/azure.identity.defaultazurecredential?view=azure-python) object to acquire a security token from Azure Active Directory. For more information on the DefaultAzureCredential in Python, see [Authenticate Python apps to Azure services by using the Azure SDK for Python](https://docs.microsoft.com/en-us/azure/developer/python/azure-sdk-authenticate?tabs=cmd). Make sure to assign the `Cognitive Services User` role to the service principal or managed identity used to authenticate to your Azure OpenAI Service. For more information, see [How to configure Azure OpenAI Service with managed identities](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/how-to/managed-identity). If you want to use Azure AD integrated security, you need to create a custom subdomain for your Azure OpenAI resource and use the specific endpoint containing the custom domain, such as [https://myopenai.openai.azure.com/](https://myopenai.openai.azure.com/) where myopenai is the custom subdomain. If you specify the regional endpoint, you get an error like the following: `Subdomain does not map to a resource`. Hence, pass the custom domain endpoint in the `AZURE_OPENAI_BASE` environment variable. In this case, you also need to refresh the security token periodically.
 
 ## Build the container image
 
@@ -1199,7 +1197,7 @@ If you deployed the Azure infrastructure using the Bicep modules provided with t
 - `ingress.yml`
 - `service.yml`
 
-If you instead want to deploy the application in your AKS cluster, you can use the following scripts to configure your environment
+If you instead want to deploy the application in your AKS cluster, you can use the following scripts to configure your environment.
 
 The `04-create-nginx-ingress-controller.sh` installs the `NGINX Ingress Controller` using Helm.
 
@@ -1293,7 +1291,7 @@ else
 fi
 ```
 
-`06-create-cluster-issuer.sh` creates a cluster issues for the the `NGINX Ingress Controller` based on the `Let's Encrypt` ACME certificate issuer.
+`06-create-cluster-issuer.sh` creates a cluster issuer for the `NGINX Ingress Controller` based on the `Let's Encrypt` ACME certificate issuer.
 
 ```bash
 #/bin/bash
@@ -1317,7 +1315,7 @@ else
 fi
 ```
 
-`07-create-workload-managed-identity.sh`: creates the managed identity used by the `magic8ball`chatbot and assign it the `Cognitive Services User` role on the Azure OpenAI Service.
+`07-create-workload-managed-identity.sh`: creates the managed identity used by the `magic8ball`chatbot and assigns it the `Cognitive Services User` role on the Azure OpenAI Service.
 
 ```bash
 #!/bin/bash
@@ -1426,7 +1424,7 @@ else
 fi
 ```
 
-`08-create-service-account.sh` creates the namespace and service account for the `magic8ball` chatbot and federate the service account with the user-defined managed identity created at the previous step.
+`08-create-service-account.sh` creates the namespace and service account for the `magic8ball` chatbot and federate the service account with the user-defined managed identity created in the previous step.
 
 ```bash
 #!/bin/bash
@@ -1534,7 +1532,7 @@ else
 fi
 ```
 
-`09-deploy-app.sh` deploys the configmap, deployment, and service used by the `magic8ball` chatbot.
+`09-deploy-app.sh` creates the Kubernetes config map, deployment, and service used by the `magic8ball` chatbot.
 
 ```bash
 #!/bin/bash
