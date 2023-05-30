@@ -1,0 +1,351 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "aksClusterNetworkPlugin": {
+      "value": "azure"
+    },
+    "aksClusterNetworkPluginMode": {
+      "value": ""
+    },
+    "aksClusterNetworkPolicy": {
+      "value": "azure"
+    },
+    "aksClusterPodCidr": {
+      "value": "192.168.0.0/16"
+    },
+    "aksClusterServiceCidr": {
+      "value": "172.16.0.0/16"
+    },
+    "aksClusterDnsServiceIP": {
+      "value": "172.16.0.10"
+    },
+    "aksClusterDockerBridgeCidr": {
+      "value": "172.17.0.1/16"
+    },
+    "aksClusterOutboundType": {
+      "value": "userAssignedNATGateway"
+    },
+    "aksClusterKubernetesVersion": {
+      "value": "1.24.0"
+    },
+    "aksClusterAdminUsername": {
+      "value": "azadmin"
+    },
+    "aksClusterSshPublicKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/1a45a694-ae23-4650-9774-89a571c462f6/resourceGroups/BaboKeyVaultResourceGroup/providers/Microsoft.KeyVault/vaults/BaboKeyVault"
+        },
+        "secretName": "aksClusterSshPublicKey"
+      }
+    },
+    "aadProfileManaged": {
+      "value": true
+    },
+    "aadProfileEnableAzureRBAC": {
+      "value": true
+    },
+    "aadProfileAdminGroupObjectIDs": {
+      "value": [
+        "4e4d0501-e693-4f3e-965b-5bec6c410c03"
+      ]
+    },
+    "systemAgentPoolName": {
+      "value": "system"
+    },
+    "systemAgentPoolVmSize": {
+      "value": "Standard_D4s_v3"
+    },
+    "systemAgentPoolOsDiskSizeGB": {
+      "value": 80
+    },
+    "systemAgentPoolAgentCount": {
+      "value": 3
+    },
+    "systemAgentPoolMaxCount": {
+      "value": 5
+    },
+    "systemAgentPoolMinCount": {
+      "value": 3
+    },
+    "systemAgentPoolNodeTaints": {
+      "value": [
+        "CriticalAddonsOnly=true:NoSchedule"
+      ]
+    },
+    "userAgentPoolName": {
+      "value": "user"
+    },
+    "userAgentPoolVmSize": {
+      "value": "Standard_D4s_v3"
+    },
+    "userAgentPoolOsDiskSizeGB": {
+      "value": 80
+    },
+    "userAgentPoolAgentCount": {
+      "value": 3
+    },
+    "userAgentPoolMaxCount": {
+      "value": 5
+    },
+    "userAgentPoolMinCount": {
+      "value": 3
+    },
+    "enableVnetIntegration": {
+      "value": true
+    },
+    "virtualNetworkAddressPrefixes": {
+      "value": "10.0.0.0/8"
+    },
+    "systemAgentPoolSubnetName": {
+      "value": "SystemSubnet"
+    },
+    "systemAgentPoolSubnetAddressPrefix": {
+      "value": "10.240.0.0/16"
+    },
+    "userAgentPoolSubnetName": {
+      "value": "UserSubnet"
+    },
+    "userAgentPoolSubnetAddressPrefix": {
+      "value": "10.241.0.0/16"
+    },
+    "podSubnetName": {
+      "value": "PodSubnet"
+    },
+    "podSubnetAddressPrefix": {
+      "value": "10.242.0.0/16"
+    },
+    "apiServerSubnetName": {
+      "value": "ApiServerSubnet"
+    },
+    "apiServerSubnetAddressPrefix": {
+      "value": "10.243.0.0/27"
+    },
+    "vmSubnetName": {
+      "value": "VmSubnet"
+    },
+    "vmSubnetAddressPrefix": {
+      "value": "10.243.1.0/24"
+    },
+    "bastionSubnetAddressPrefix": {
+      "value": "10.243.2.0/24"
+    },
+    "applicationGatewaySubnetName": {
+      "value": "AppGatewaySubnet"
+    },
+    "applicationGatewaySubnetAddressPrefix": {
+      "value": "10.243.3.0/24"
+    },
+    "applicationGatewayEnabled": {
+      "value": false
+    },
+    "applicationGatewayAvailabilityZones": {
+      "value": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    "applicationGatewayPrivateIpAddress": {
+      "value": "10.243.3.4"
+    },
+    "applicationGatewayPrivateLinkEnabled": {
+      "value": true
+    },
+    "applicationGatewayFrontendIpConfigurationType": {
+      "value": "Public"
+    },
+    "logAnalyticsSku": {
+      "value": "PerGB2018"
+    },
+    "logAnalyticsRetentionInDays": {
+      "value": 60
+    },
+    "vmEnabled": {
+      "value": true
+    },
+    "vmName": {
+      "value": "TestVm"
+    },
+    "vmSize": {
+      "value": "Standard_F4s_v2"
+    },
+    "imagePublisher": {
+      "value": "Canonical"
+    },
+    "imageOffer": {
+      "value": "0001-com-ubuntu-server-jammy"
+    },
+    "imageSku": {
+      "value": "22_04-lts-gen2"
+    },
+    "authenticationType": {
+      "value": "sshPublicKey"
+    },
+    "vmAdminUsername": {
+      "value": "azadmin"
+    },
+    "vmAdminPasswordOrKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/1a45a694-ae23-4650-9774-89a571c462f6/resourceGroups/BaboKeyVaultResourceGroup/providers/Microsoft.KeyVault/vaults/BaboKeyVault"
+        },
+        "secretName": "vmAdminSshPublicKey"
+      }
+    },
+    "diskStorageAccountType": {
+      "value": "Premium_LRS"
+    },
+    "numDataDisks": {
+      "value": 1
+    },
+    "osDiskSize": {
+      "value": 50
+    },
+    "dataDiskSize": {
+      "value": 50
+    },
+    "dataDiskCaching": {
+      "value": "ReadWrite"
+    },
+    "aksClusterEnablePrivateCluster": {
+      "value": false
+    },
+    "aksEnablePrivateClusterPublicFQDN": {
+      "value": false
+    },
+    "podIdentityProfileEnabled": {
+      "value": false
+    },
+    "keyVaultObjectIds": {
+      "value": [
+        "0c5267b2-01f3-4a59-970e-0d9218d5412e"
+      ]
+    },
+    "openServiceMeshEnabled": {
+      "value": false
+    },
+    "istioServiceMeshEnabled": {
+      "value": true
+    },
+    "istioIngressGatewayEnabled": {
+      "value": true
+    },
+    "istioIngressGatewayType": {
+      "value": "External"
+    },
+    "kedaEnabled": {
+      "value": true
+    },
+    "daprEnabled": {
+      "value": true
+    },
+    "fluxGitOpsEnabled": {
+      "value": true
+    },
+    "verticalPodAutoscalerEnabled": {
+      "value": true
+    },
+    "azurePolicyEnabled": {
+      "value": true
+    },
+    "azureKeyvaultSecretsProviderEnabled": {
+      "value": true
+    },
+    "kubeDashboardEnabled": {
+      "value": false
+    },
+
+    "systemAgentPoolKubeletDiskType": {
+      "value": "OS"
+    },
+    "userAgentPoolKubeletDiskType": {
+      "value": "OS"
+    },
+    "systemAgentPoolOsDiskType": {
+      "value": "Ephemeral"
+    },
+    "userAgentPoolOsDiskType": {
+      "value": "Ephemeral"
+    },
+    "deploymentScriptUri": {
+      "value": "https://paolosalvatori.blob.core.windows.net/scripts/install-nginx-via-helm-and-create-sa.sh"
+    },
+    "blobCSIDriverEnabled": {
+      "value": true
+    },
+    "diskCSIDriverEnabled": {
+      "value": true
+    },
+    "fileCSIDriverEnabled": {
+      "value": true
+    },
+    "snapshotControllerEnabled": {
+      "value": true
+    },
+    "defenderSecurityMonitoringEnabled": {
+      "value": true
+    },
+    "imageCleanerEnabled": {
+      "value": true
+    },
+    "imageCleanerIntervalHours": {
+      "value": 24
+    },
+    "nodeRestrictionEnabled": {
+      "value": true
+    },
+    "workloadIdentityEnabled": {
+      "value": true
+    },
+    "oidcIssuerProfileEnabled": {
+      "value": true
+    },
+    "openAiEnabled": {
+      "value": true
+    },
+    "openAiDeployments": {
+      "value": [
+        {
+          "name": "gpt-35-turbo",
+          "version": "0301",
+          "raiPolicyName": "",
+          "capacity": null,
+          "scaleType": "Standard"
+        }
+      ]
+    },
+    "domain": {
+      "value": "contoso.internal"
+    },
+    "subdomain": {
+      "value": "magic8ball"
+    },
+    "namespace": {
+      "value": "magic8ball"
+    },
+    "serviceAccountName": {
+      "value": "magic8ball-sa"
+    },
+    "tags": {
+      "value": {
+        "iaC": "Bicep"
+      }
+    },
+    "clusterTags": {
+      "value": {
+        "environment": "Development",
+        "project": "AKS",
+        "iaC": "Bicep",
+        "serviceMesh": "Istio",
+        "networkPlugin": "Azure CNI",
+        "networkPolicy": "Azure",
+        "private": "false",
+        "apiServerVnetIntegration": true,
+        "podSubnet": true,
+        "perAgentPoolSubnet": true
+      }
+    }
+  }
+}
