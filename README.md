@@ -364,6 +364,16 @@ output issuerUrl string = aksCluster.properties.oidcIssuerProfile.issuerURL
 output workloadManagedIdentityClientId string = workloadManagedIdentity.properties.clientId
 ```
 
+## Validate the deployment
+
+Open the Azure Portal, and navigate to the resource group. Open the Azure Open AI Service resource, navigate to `Keys and Endpoint`, and check that the endpoint contains a custom subdomain rather than the regional Cognitive Services endpoint.
+
+![OpenAI Key and Endpoint](/images/openai.png)
+
+Open to the `<Prefix>WorkloadManagedIdentity` managed identity, navigate to the `Federated credentials`, and verify that the federated identity credentials for the `magic8ball-sa` service account account were properly created, as shown in the following picture.
+
+![Federated Identity Credentials](/images/federatedidentitycredentials.png)
+
 ## Use Azure AD workload identity with Azure Kubernetes Service (AKS)
 
 Workloads deployed on an Azure Kubernetes Services (AKS) cluster require Azure Active Directory (Azure AD) application credentials or managed identities to access Azure AD protected resources, such as Azure Key Vault and Microsoft Graph. Azure AD workload identity integrates with the capabilities native to Kubernetes to federate with external identity providers.
@@ -1074,7 +1084,108 @@ You can use two different authentication methods in the `magic8ball` chatbot app
 
 ## Build the container image
 
-You can build the container image using the `01-build-docker-image.sh` in the `scripts` folder. 
+You can build the container image using the `Dockerfile` and `01-build-docker-image.sh` in the `scripts` folder.
+
+**Dockefile**
+
+```bash
+# app/Dockerfile
+
+# # Stage 1 - Install build dependencies
+
+# A Dockerfile must start with a FROM instruction which sets the base image for the container.
+# The Python images come in many flavors, each designed for a specific use case.
+# The python:3.11-slim image is a good base image for most applications.
+# It is a minimal image built on top of Debian Linux and includes only the necessary packages to run Python.
+# The slim image is a good choice because it is small and contains only the packages needed to run Python.
+# For more information, see: 
+# * https://hub.docker.com/_/python 
+# * https://docs.streamlit.io/knowledge-base/tutorials/deploy/docker
+FROM python:3.11-slim AS builder
+
+# The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile.
+# If the WORKDIR doesn’t exist, it will be created even if it’s not used in any subsequent Dockerfile instruction.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#workdir
+WORKDIR /app
+
+# Set environment variables. 
+# The ENV instruction sets the environment variable <key> to the value <value>.
+# This value will be in the environment of all “descendant” Dockerfile commands and can be replaced inline in many as well.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#env
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Install git so that we can clone the app code from a remote repo using the RUN instruction.
+# The RUN comand has 2 forms:
+# * RUN <command> (shell form, the command is run in a shell, which by default is /bin/sh -c on Linux or cmd /S /C on Windows)
+# * RUN ["executable", "param1", "param2"] (exec form)
+# The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. 
+# The resulting committed image will be used for the next step in the Dockerfile.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#run
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    software-properties-common \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a virtualenv to keep dependencies together
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Clone the requirements.txt which contains dependencies to WORKDIR
+# COPY has two forms:
+# * COPY <src> <dest> (this copies the files from the local machine to the container's own filesystem)
+# * COPY ["<src>",... "<dest>"] (this form is required for paths containing whitespace)
+# For more information, see: https://docs.docker.com/engine/reference/builder/#copy
+COPY requirements.txt .
+
+# Install the Python dependencies
+RUN pip install --no-cache-dir --no-deps -r requirements.txt
+
+# Stage 2 - Copy only necessary files to the runner stage
+
+# The FROM instruction initializes a new build stage for the application
+FROM python:3.11-slim
+
+# Sets the working directory to /app
+WORKDIR /app
+
+# Copy the virtual environment from the builder stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Set environment variables
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Clone the app.py containing the application code
+COPY app.py .
+
+# Copy the images folder to WORKDIR
+# The ADD instruction copies new files, directories or remote file URLs from <src> and adds them to the filesystem of the image at the path <dest>.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#add
+ADD images ./images
+
+# The EXPOSE instruction informs Docker that the container listens on the specified network ports at runtime.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#expose
+EXPOSE 8501
+
+# The HEALTHCHECK instruction has two forms:
+# * HEALTHCHECK [OPTIONS] CMD command (check container health by running a command inside the container)
+# * HEALTHCHECK NONE (disable any healthcheck inherited from the base image)
+# The HEALTHCHECK instruction tells Docker how to test a container to check that it is still working. 
+# This can detect cases such as a web server that is stuck in an infinite loop and unable to handle new connections, 
+# even though the server process is still running. For more information, see: https://docs.docker.com/engine/reference/builder/#healthcheck
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+
+# The ENTRYPOINT instruction has two forms:
+# * ENTRYPOINT ["executable", "param1", "param2"] (exec form, preferred)
+# * ENTRYPOINT command param1 param2 (shell form)
+# The ENTRYPOINT instruction allows you to configure a container that will run as an executable.
+# For more information, see: https://docs.docker.com/engine/reference/builder/#entrypoint
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+```
+
+**01-build-docker-image.sh**
 
 ```bash
 #!/bin/bash
@@ -1165,6 +1276,8 @@ host="$subdomain.$dnsZoneName"
 ## Upload Docker container image to Azure Container Registry (ACR)
 
 You can push the Docker container image to Azure Container Registry (ACR) using the `03-push-docker-image.sh` script in the `scripts` folder.
+
+**03-push-docker-image.sh**
 
 ```bash
 #!/bin/bash
@@ -1685,6 +1798,237 @@ fi
 ```
 
 The scripts used to deploy the YAML template use the [yq](https://github.com/mikefarah/yq) tool to customize the manifests with the value of the variables defined in the `00-variables.sh` file. This tool is a lightweight and portable command-line YAML, JSON and XML processor that uses [jq](https://jqlang.github.io/jq/) like syntax but works with YAML files as well as json, xml, properties, csv and tsv. It doesn't yet support everything jq does - but it does support the most common operations and functions, and more is being added continuously.
+
+## YAML manifests
+
+Below you can read the YAML manifests used to deploy the `magic8ball` chatbot to AKS. The `configmap.yml` defines a value for the environment variables passed to the application container. The configmap does not define any environment variable for the OpenAI key as the container 
+
+**configmap.yml**
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: magic8ball-configmap
+data:
+  TITLE: "Magic 8 Ball"
+  LABEL: "Pose your question and cross your fingers!"
+  TEMPERATURE: "0.9"
+  IMAGE_WIDTH: "80"
+  AZURE_OPENAI_TYPE: azure_ad
+  AZURE_OPENAI_BASE: https://baboopenai.openai.azure.com/
+  AZURE_OPENAI_KEY: ""
+  AZURE_OPENAI_MODEL: gpt-35-turbo
+  AZURE_OPENAI_DEPLOYMENT: magic8ballGPT
+```
+
+These are the parameters defined by the configmap:
+
+- `AZURE_OPENAI_TYPE`: specify `azure` if you want to let the application use the API key to authenticate against OpenAI. In this case, make sure to provide the Key in the `AZURE_OPENAI_KEY` environment variable. If you want to authenticate using an Azure AD security token, you need to specify `azure_ad` as a value. In this case, don't need to provide any value in the `AZURE_OPENAI_KEY` environment variable.
+- `AZURE_OPENAI_BASE`: the URL of your Azure OpenAI resource. If you use the API key to authenticate against OpenAI, you can specify the regional endpoint of your Azure OpenAI Service (e.g., [https://eastus.api.cognitive.microsoft.com/](https://eastus.api.cognitive.microsoft.com/)). If you instead plan to use Azure AD security tokens for authentication, you need to deploy your Azure OpenAI Service with a subdomain and specify the resource-specific endpoint url (e.g., [https://myopenai.openai.azure.com/](https://myopenai.openai.azure.com/)).
+- `AZURE_OPENAI_KEY`: the key of your Azure OpenAI resource. If you set `AZURE_OPENAI_TYPE` to `azure_ad` you can leave this parameter empty.
+- `AZURE_OPENAI_DEPLOYMENT`: the name of the ChatGPT deployment used by your Azure OpenAI resource, for example `gpt-35-turbo`.
+- `AZURE_OPENAI_MODEL`: the name of the ChatGPT model used by your Azure OpenAI resource, for example `gpt-35-turbo`.
+- `TITLE`: the title of the Streamlit app.
+- `TEMPERATURE`: the temperature used by the OpenAI API to generate the response.
+- `SYSTEM`: give the model instructions about how it should behave and any context it should reference when generating a response. Used to describe the assistant's personality.
+
+The `deployment.yml` manifest is used create a Kubernetes [deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) that defines the application pods to create. [azure.workload.identity/use](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview#pod-labels) label is required in the pod template spec. Only pods with this label will be mutated by the azure-workload-identity mutating admission webhook to inject the Azure specific environment variables and the projected service account token volume.
+
+**deployment.yml**
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: magic8ball
+  labels:
+    app: magic8ball
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: magic8ball
+      azure.workload.identity/use: "true"
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: magic8ball
+        azure.workload.identity/use: "true"
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccountName: magic8ball-sa
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: magic8ball
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: magic8ball
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: magic8ball
+        image: paolosalvatori.azurecr.io/magic8ball:v1
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8501
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8501
+          failureThreshold: 1
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8501
+          failureThreshold: 1
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+        startupProbe:
+          httpGet:
+            path: /
+            port: 8501
+          failureThreshold: 1
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+        env:
+        - name: TITLE
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: TITLE
+        - name: IMAGE_WIDTH
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: IMAGE_WIDTH
+        - name: LABEL
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: LABEL
+        - name: TEMPERATURE
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: TEMPERATURE
+        - name: AZURE_OPENAI_TYPE
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: AZURE_OPENAI_TYPE
+        - name: AZURE_OPENAI_BASE
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: AZURE_OPENAI_BASE
+        - name: AZURE_OPENAI_KEY
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: AZURE_OPENAI_KEY
+        - name: AZURE_OPENAI_MODEL
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: AZURE_OPENAI_MODEL
+        - name: AZURE_OPENAI_DEPLOYMENT
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: AZURE_OPENAI_DEPLOYMENT
+```
+
+The application is exposed using a `ClusterIP` Kubernetes [service](https://kubernetes.io/docs/concepts/services-networking/service/).
+
+**service.yml**
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: magic8ball
+  labels:
+    app: magic8ball
+spec:
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 8501
+  selector:
+    app: magic8ball
+```
+
+The `ingress.yml` manifest defines a Kubernetes [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object used to expose the service via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/). The annotations declare that the 
+
+**ingress.yml**
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: magic8ball-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-nginx
+    cert-manager.io/acme-challenge-type: http01 
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "360"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "360"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "360"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "360"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: SAMEORIGIN";
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - magic8ball.babosbird.com
+    secretName: tls-secret
+  rules:
+  - host: magic8ball.babosbird.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: magic8ball
+            port:
+              number: 8501
+```
+
+The ingress object defines the following annotations:
+
+- [cert-manager.io/cluster-issuer](https://cert-manager.io/docs/usage/ingress/#supported-annotations): specifies the name of a cert-manager.io ClusterIssuer to acquire the certificate required for this Ingress. It does not matter which namespace your Ingress resides, as ClusterIssuers are non-namespaced resources. In this sample, the cert-manager is instructed to use the `letsencrypt-nginx` ClusterIssuer that you can create using the `06-create-cluster-issuer.sh` script.
+- [cert-manager.io/acme-challenge-type](https://cert-manager.io/docs/usage/ingress/#supported-annotations): specifies the challend type.
+- [nginx.ingress.kubernetes.io/proxy-connect-timeout](https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md#custom-timeouts): specifies the connection timeout in seconds.
+- [nginx.ingress.kubernetes.io/proxy-send-timeout](https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md#custom-timeouts): specifies the send timeout in seconds.
+- [nginx.ingress.kubernetes.io/proxy-read-timeout](https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md#custom-timeouts): specifies the read timeout in seconds.
+- [nginx.ingress.kubernetes.io/proxy-next-upstream-timeout](https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md#custom-timeouts): specifies the next upstream timeout in seconds.
+- [nginx.ingress.kubernetes.io/configuration-snippet](https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md#configuration-snippet): allows additional configuration to the NGINX location.
 
 ## Review deployed resources
 
