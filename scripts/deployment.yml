@@ -106,6 +106,11 @@ spec:
             configMapKeyRef:
                 name: magic8ball-configmap
                 key: AZURE_OPENAI_BASE
+        - name: AZURE_OPENAI_KEY
+          valueFrom:
+            configMapKeyRef:
+                name: magic8ball-configmap
+                key: AZURE_OPENAI_KEY
         - name: AZURE_OPENAI_MODEL
           valueFrom:
             configMapKeyRef:
