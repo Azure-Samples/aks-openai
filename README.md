@@ -370,7 +370,7 @@ Open the Azure Portal, and navigate to the resource group. Open the Azure Open A
 
 ![OpenAI Key and Endpoint](/images/openai.png)
 
-Open to the `<Prefix>WorkloadManagedIdentity` managed identity, navigate to the `Federated credentials`, and verify that the federated identity credentials for the `magic8ball-sa` service account account were properly created, as shown in the following picture.
+Open to the `<Prefix>WorkloadManagedIdentity` managed identity, navigate to the `Federated credentials`, and verify that the federated identity credentials for the `magic8ball-sa` service account were created correctly, as shown in the following picture.
 
 ![Federated Identity Credentials](/images/federatedidentitycredentials.png)
 
@@ -1312,7 +1312,9 @@ If you deployed the Azure infrastructure using the Bicep modules provided with t
 
 If you instead want to deploy the application in your AKS cluster, you can use the following scripts to configure your environment.
 
-The `04-create-nginx-ingress-controller.sh` installs the `NGINX Ingress Controller` using Helm.
+**04-create-nginx-ingress-controller.sh** 
+
+This script installs the `NGINX Ingress Controller` using Helm.
 
 ```bash
 #!/bin/bash
@@ -1365,7 +1367,9 @@ SecRule REMOTE_ADDR "@ipMatch 127.0.0.1" "id:87,phase:1,pass,nolog,ctl:ruleEngin
 fi
 ```
 
-`05-install-cert-manager.sh`installs the `cert-manager` using Helm.
+**05-install-cert-manager.sh**
+
+This script installs the `cert-manager` using Helm.
 
 ```bash
 #/bin/bash
@@ -1404,7 +1408,9 @@ else
 fi
 ```
 
-`06-create-cluster-issuer.sh` creates a cluster issuer for the `NGINX Ingress Controller` based on the `Let's Encrypt` ACME certificate issuer.
+**06-create-cluster-issuer.sh**
+
+This script creates a cluster issuer for the `NGINX Ingress Controller` based on the `Let's Encrypt` ACME certificate issuer.
 
 ```bash
 #/bin/bash
@@ -1428,7 +1434,9 @@ else
 fi
 ```
 
-`07-create-workload-managed-identity.sh`: creates the managed identity used by the `magic8ball`chatbot and assigns it the `Cognitive Services User` role on the Azure OpenAI Service.
+**07-create-workload-managed-identity.sh**
+
+This script creates the managed identity used by the `magic8ball`chatbot and assigns it the `Cognitive Services User` role on the Azure OpenAI Service.
 
 ```bash
 #!/bin/bash
@@ -1537,7 +1545,9 @@ else
 fi
 ```
 
-`08-create-service-account.sh` creates the namespace and service account for the `magic8ball` chatbot and federate the service account with the user-defined managed identity created in the previous step.
+**08-create-service-account.sh`**
+
+This script creates the namespace and service account for the `magic8ball` chatbot and federate the service account with the user-defined managed identity created in the previous step.
 
 ```bash
 #!/bin/bash
@@ -1645,7 +1655,9 @@ else
 fi
 ```
 
-`09-deploy-app.sh` creates the Kubernetes config map, deployment, and service used by the `magic8ball` chatbot.
+**09-deploy-app.sh`**
+
+This script creates the Kubernetes config map, deployment, and service used by the `magic8ball` chatbot.
 
 ```bash
 #!/bin/bash
@@ -1696,7 +1708,9 @@ cat $deploymentTemplate |
 kubectl apply -f $serviceTemplate -n $namespace
 ```
 
-`10-create-ingress.sh` creates the ingress object to expose the service via the `NGINX Ingress Controller`
+**10-create-ingress.sh**
+
+This script creates the ingress object to expose the service via the `NGINX Ingress Controller`
 
 ```bash
 #/bin/bash
@@ -1713,7 +1727,9 @@ cat $ingressTemplate |
   kubectl apply -n $namespace -f -
 ```
 
-`11-configure-dns.sh` creates an A record in the Azure DNS Zone to expose the application via a given subdomain (e.g., [https://magic8ball.example.com](https://magic8ball.example.com))
+**11-configure-dns.sh**
+
+This script creates an A record in the Azure DNS Zone to expose the application via a given subdomain (e.g., [https://magic8ball.example.com](https://magic8ball.example.com))
 
 ```bash
 # Variables
@@ -1801,9 +1817,10 @@ The scripts used to deploy the YAML template use the [yq](https://github.com/mik
 
 ## YAML manifests
 
-Below you can read the YAML manifests used to deploy the `magic8ball` chatbot to AKS. The `configmap.yml` defines a value for the environment variables passed to the application container. The configmap does not define any environment variable for the OpenAI key as the container 
+Below you can read the YAML manifests used to deploy the `magic8ball` chatbot to AKS.
 
 **configmap.yml**
+The `configmap.yml` defines a value for the environment variables passed to the application container. The configmap does not define any environment variable for the OpenAI key as the container .
 
 ```yaml
 apiVersion: v1
@@ -1833,9 +1850,10 @@ These are the parameters defined by the configmap:
 - `TEMPERATURE`: the temperature used by the OpenAI API to generate the response.
 - `SYSTEM`: give the model instructions about how it should behave and any context it should reference when generating a response. Used to describe the assistant's personality.
 
+**deployment.yml**
+
 The `deployment.yml` manifest is used create a Kubernetes [deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) that defines the application pods to create. [azure.workload.identity/use](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview#pod-labels) label is required in the pod template spec. Only pods with this label will be mutated by the azure-workload-identity mutating admission webhook to inject the Azure specific environment variables and the projected service account token volume.
 
-**deployment.yml**
 
 ```yaml
 apiVersion: apps/v1
@@ -1963,9 +1981,9 @@ spec:
                 key: AZURE_OPENAI_DEPLOYMENT
 ```
 
-The application is exposed using a `ClusterIP` Kubernetes [service](https://kubernetes.io/docs/concepts/services-networking/service/).
-
 **service.yml**
+
+The application is exposed using a `ClusterIP` Kubernetes [service](https://kubernetes.io/docs/concepts/services-networking/service/).
 
 ```yaml
 apiVersion: v1
@@ -1983,9 +2001,9 @@ spec:
     app: magic8ball
 ```
 
-The `ingress.yml` manifest defines a Kubernetes [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object used to expose the service via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/). The annotations declare that the 
-
 **ingress.yml**
+
+The `ingress.yml` manifest defines a Kubernetes [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object used to expose the service via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/).
 
 ```yaml
 apiVersion: networking.k8s.io/v1
