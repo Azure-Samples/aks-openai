@@ -30,7 +30,7 @@ urlFragment: aks-istio-addon-bicep
 azureDeploy: "https://raw.githubusercontent.com/Azure-Samples/aks-istio-addon-bicep/main/bicep/main.json"
 ---
 
-# How to deploy and run an Azure OpenAI ChatGPT application on AKS
+# How to deploy and run an Azure OpenAI ChatGPT application on AKS via Bicep
 
 This sample shows how to deploy an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) and how to deploy a Python chatbot that authenticates against Azure OpenAI using [Azure AD workload identity](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview) and calls the [Chat Completion API](https://platform.openai.com/docs/api-reference/chat) of a [ChatGPT model](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/concepts/models#chatgpt-gpt-35-turbo). A chatbot is an application that simulates human-like conversations with users via chat. Its key task is to answer user questions with instant messages. [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster communicates with [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) via an [Azure Private Endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview). The chatbot application simulates the original [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball) plastic sphere, made to look like an oversized eight ball, that is used for fortune-telling or seeking advice.
 
