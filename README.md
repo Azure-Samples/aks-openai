@@ -24,8 +24,8 @@ products:
 - azure-monitor
 - azure-log-analytics
 - azure-virtual-machines
-name:  How to install an AKS cluster with the Istio service mesh add-on via Bicep
-description: This sample shows how to install an AKS cluster with the Istio service mesh add-on via Bicep.
+name:  How to deploy and run an Azure OpenAI ChatGPT application on AKS via Bicep
+description: This article shows how to deploy an AKS cluster and Azure OpenAI Service via Bicep and how to deploy a ChatGPT-like application in Python.
 urlFragment: aks-openai
 azureDeploy: "https://raw.githubusercontent.com/Azure-Samples/aks-openai/main/bicep/main.json"
 ---
