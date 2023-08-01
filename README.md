@@ -26,6 +26,7 @@ products:
 - azure-virtual-machines
 name:  How to install an AKS cluster with the Istio service mesh add-on via Bicep
 description: This sample shows how to install an AKS cluster with the Istio service mesh add-on via Bicep.
+urlFragment: aks-openai
 azureDeploy: "https://raw.githubusercontent.com/Azure-Samples/aks-openai/main/bicep/main.json"
 ---
 
@@ -671,7 +672,7 @@ The `install-nginx-via-helm-and-create-sa.sh` Bash script returns the following 
 
 ## Chatbot Application
 
-The chatbot is a Python application inspired by the sample code in the [It’s Time To Create A Private ChatGPT For Yourself Today](https://levelup.gitconnected.com/its-time-to-create-a-private-chatgpt-for-yourself-today-6503649e7bb6) arctiel. The application is contained in a single file called `app.py`. The application makes use of the following libraries:
+The chatbot is a Python application inspired by the sample code in the [It’s Time To Create A Private ChatGPT For Yourself Today](https://levelup.gitconnected.com/its-time-to-create-a-private-chatgpt-for-yourself-today-6503649e7bb6) article. The application is contained in a single file called `app.py`. The application makes use of the following libraries:
 
 - [OpenAPI](https://github.com/openai/openai-python): The OpenAI Python library provides convenient access to the OpenAI API from applications written in the Python language. It includes a pre-defined set of classes for API resources that initialize themselves dynamically from API responses which makes it compatible with a wide range of versions of the OpenAI API. You can find usage examples for the OpenAI Python library in our [API reference](https://beta.openai.com/docs/api-reference?lang=python) and the [OpenAI Cookbook](https://github.com/openai/openai-cookbook/).
 - [Azure Identity](https://learn.microsoft.com/en-us/python/api/overview/azure/identity-readme?view=azure-python): The Azure Identity library provides [Azure Active Directory (Azure AD)](https://learn.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-whatis) token authentication support across the Azure SDK. It provides a set of [TokenCredential](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.credentials.tokencredential?view=azure-python) implementations, which can be used to construct Azure SDK clients that support Azure AD token authentication.

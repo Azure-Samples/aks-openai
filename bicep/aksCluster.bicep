@@ -70,6 +70,9 @@ param dockerBridgeCidr string = '172.17.0.1/16'
 ])
 param loadBalancerSku string = 'standard'
 
+@description('Specifies the IP families are used to determine single-stack or dual-stack clusters. For single-stack, the expected value is IPv4. For dual-stack, the expected values are IPv4 and IPv6.')
+param ipFamilies array = ['IPv4']
+
 @description('Specifies outbound (egress) routing method. - loadBalancer or userDefinedRouting.')
 @allowed([
   'loadBalancer'
@@ -631,6 +634,7 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-03-02-previ
       outboundType: outboundType
       loadBalancerSku: loadBalancerSku
       loadBalancerProfile: null
+      ipFamilies: ipFamilies
     }
     workloadAutoScalerProfile: {
       keda: {
