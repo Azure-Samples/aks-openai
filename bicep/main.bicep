@@ -72,6 +72,9 @@ param aksClusterDockerBridgeCidr string = '172.17.0.1/16'
 ])
 param aksClusterLoadBalancerSku string = 'standard'
 
+@description('Specifies the IP families are used to determine single-stack or dual-stack clusters. For single-stack, the expected value is IPv4. For dual-stack, the expected values are IPv4 and IPv6.')
+param aksClusterIpFamilies array = ['IPv4']
+
 @description('Specifies outbound (egress) routing method. - loadBalancer or userDefinedRouting.')
 @allowed([
   'loadBalancer'
@@ -943,6 +946,7 @@ module aksCluster 'aksCluster.bicep' = {
     dnsServiceIP: aksClusterDnsServiceIP
     dockerBridgeCidr: aksClusterDockerBridgeCidr
     loadBalancerSku: aksClusterLoadBalancerSku
+    ipFamilies: aksClusterIpFamilies
     outboundType: aksClusterOutboundType
     skuTier: aksClusterSkuTier
     kubernetesVersion: aksClusterKubernetesVersion
