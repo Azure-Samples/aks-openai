@@ -368,7 +368,7 @@ output workloadManagedIdentityClientId string = workloadManagedIdentity.properti
 
 ## Validate the deployment
 
-Open the Azure Portal, and navigate to the resource group. Open the Azure Open AI Service resource, navigate to `Keys and Endpoint`, and check that the endpoint contains a custom subdomain rather than the regional Cognitive Services endpoint.
+Open the Azure Portal, and navigate to the resource group. Open the Azure OpenAI Service resource, navigate to `Keys and Endpoint`, and check that the endpoint contains a custom subdomain rather than the regional Cognitive Services endpoint.
 
 ![OpenAI Key and Endpoint](/images/openai.png)
 
